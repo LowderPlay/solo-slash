@@ -4,8 +4,10 @@ using Microsoft.Xna.Framework.Input;
 using rhythm_cs2;
 using solo_slasher.component;
 using solo_slasher.component.render;
+using solo_slasher.prefabs;
 using solo_slasher.system;
 using solo_slasher.system.notes;
+using solo_slasher.system.render;
 
 namespace solo_slasher;
 
@@ -13,8 +15,9 @@ public class Game1 : Game
 {
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
-    private EntityManager _entityManager;
     private RenderSystem _renderSystem;
+    private RenderPipelineBuilderSystem _renderPipelineBuilderSystem;
+    
     private KeyboardMovementSystem _keyboardMovementSystem;
     private DuelStartSystem _duelStartSystem;
     private UiSystem _uiSystem;
@@ -37,65 +40,29 @@ public class Game1 : Game
 
     protected override void Initialize()
     {
-        _entityManager = new EntityManager();
-        _keyboardMovementSystem = new KeyboardMovementSystem(_entityManager);
-        _keyboardHitCheckSystem = new KeyboardHitCheckSystem(_entityManager);
-        _duelStartSystem = new DuelStartSystem(_entityManager);
-        _noteSpawnerSystem = new NoteSpawnerSystem(_entityManager);
-        _velocityMoveSystem = new VelocityMoveSystem(_entityManager);
-        _noteMissSystem = new NoteMissSystem(_entityManager);
-        _uiSystem = new UiSystem(_entityManager);
+        _keyboardMovementSystem = new KeyboardMovementSystem();
+        _keyboardHitCheckSystem = new KeyboardHitCheckSystem();
+        _duelStartSystem = new DuelStartSystem();
+        _noteSpawnerSystem = new NoteSpawnerSystem();
+        _velocityMoveSystem = new VelocityMoveSystem();
+        _noteMissSystem = new NoteMissSystem();
+        _uiSystem = new UiSystem();
 
         base.Initialize();
     }
 
     protected override void LoadContent()
     {
-        AssetsManager.LoadAssets(Content, GraphicsDevice);
+        Assets.LoadAssets(Content, GraphicsDevice);
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-        var player = _entityManager.CreateEntity();
-        _entityManager.AddComponent(player, new PositionComponent());
-        _entityManager.AddComponent(player, new ScaleComponent { Scale = 4f });
-        _entityManager.AddComponent(player, new ZOrderComponent { ZOrder = 1 });
-        _entityManager.AddComponent(player, new TextureComponent
-        {
-            Texture = AssetsManager.Player,
-            Alignment = new Vector2(0.5f, 0.5f)
-        });
-        _entityManager.AddComponent(player, new KeyboardControllableComponent
-        {
-            StepMultiplier = 4,
-        });
-        _entityManager.AddComponent(player, new CameraOriginComponent());
-        
-        var background = _entityManager.CreateEntity();
-        _entityManager.AddComponent(background, new ScaleComponent { Scale = 4f });
-        _entityManager.AddComponent(background, new PositionComponent
-        {
-            Position = -new Vector2(AssetsManager.Background.Width * 2, AssetsManager.Background.Height * 2)
-        });
-        _entityManager.AddComponent(background, new TextureComponent
-        {
-            Texture = AssetsManager.Background,
-        });
-        
-        var enemy = _entityManager.CreateEntity();
-        _entityManager.AddComponent(enemy, new DuelableComponent());
-        _entityManager.AddComponent(enemy, new PositionComponent
-        {
-            Position = new Vector2(128, 128)
-        });
-        _entityManager.AddComponent(enemy, new ScaleComponent { Scale = 4f });
-        _entityManager.AddComponent(enemy, new ZOrderComponent { ZOrder = 1 });
-        _entityManager.AddComponent(enemy, new TextureComponent
-        {
-            Texture = AssetsManager.Enemy,
-            Alignment = new Vector2(0.5f, 0.5f)
-        });
+        MapPrefab.Create();
+        PlayerPrefab.Create();
+        EnemyPrefab.Create();
 
         _uiSystem.Initialize(GraphicsDevice.Viewport.Bounds);
-        _renderSystem = new RenderSystem(_entityManager, _spriteBatch);
+        _renderSystem = new RenderSystem(_spriteBatch);
+        _renderPipelineBuilderSystem = new RenderPipelineBuilderSystem();
     }
 
     protected override void Update(GameTime gameTime)
@@ -103,7 +70,8 @@ public class Game1 : Game
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
 
-        _keyboardMovementSystem.Update();
+        _renderPipelineBuilderSystem.Update(gameTime);
+        _keyboardMovementSystem.Update(gameTime);
         _keyboardHitCheckSystem.Update();
         _duelStartSystem.Update(gameTime);
         _velocityMoveSystem.Update(gameTime);

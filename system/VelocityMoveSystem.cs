@@ -3,18 +3,18 @@ using solo_slasher.component;
 
 namespace solo_slasher.system.notes;
 
-public class VelocityMoveSystem(EntityManager entityManager)
+public class VelocityMoveSystem
 {
     public void Update(GameTime gameTime)
     {
-        foreach (var entity in entityManager.GetEntitiesWith<VelocityComponent>())
+        foreach (var entity in EntityManager.GetEntitiesWith<VelocityComponent>())
         {
-            var velocity = entityManager.GetComponent<VelocityComponent>(entity);
-            if (entityManager.TryGetComponent<PositionComponent>(entity, out var positionComponent))
+            var velocity = EntityManager.GetComponent<VelocityComponent>(entity);
+            if (EntityManager.TryGetComponent<PositionComponent>(entity, out var positionComponent))
             {
                 positionComponent.Position += velocity.Velocity * (float) gameTime.ElapsedGameTime.TotalSeconds;
             } 
-            else if (entityManager.TryGetComponent<ScreenPositionComponent>(entity, out var screenPosition))
+            else if (EntityManager.TryGetComponent<ScreenPositionComponent>(entity, out var screenPosition))
             {
                 screenPosition.Position += velocity.Velocity * (float) gameTime.ElapsedGameTime.TotalSeconds;
             } 

@@ -1,45 +1,30 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using rhythm_cs2;
 using solo_slasher.component;
 using solo_slasher.component.notes;
 using solo_slasher.component.render;
 using solo_slasher.duel;
+using solo_slasher.prefabs;
 
 namespace solo_slasher.system.notes;
 
-public class NoteSpawnerSystem(EntityManager entityManager)
+public class NoteSpawnerSystem
 {
-    
     public void HandleNoteSpawn(GameTime gameTime, Rectangle viewportBounds)
     {
-        if(!entityManager.TryGetFirstEntityWith<DuelingComponent>(out var player)) return;
-        var duel = entityManager.GetComponent<DuelingComponent>(player);
-        // if(duel.DuelState.Notes.Count <= 0) return;
+        if(!EntityManager.TryGetFirstEntityWith<DuelingComponent>(out var player)) return;
+        var duel = EntityManager.GetComponent<DuelingComponent>(player);
 
-        var beatTime = (gameTime.TotalGameTime - duel.DuelState.StartTime).TotalMilliseconds * ((double)duel.DuelState.Bpm / (60 * 1000));
+        var msPerBeat = (double)duel.DuelState.Bpm / (60 * 1000);
+        var arriveTime = (gameTime.TotalGameTime - duel.DuelState.StartTime).TotalMilliseconds + Constants.NoteFlyDuration * 1000;
+        var beatTime = arriveTime * msPerBeat;
         
         while (duel.DuelState.Notes.TryPeek(out var note) && note.TimeInBeats <= beatTime)
         {
-            SpawnNote(duel.DuelState.Notes.Dequeue(), viewportBounds);
+            var lateForMs = (beatTime - note.TimeInBeats) / msPerBeat;
+            Console.WriteLine($"Late for {lateForMs}ms");
+            NotePrefab.Create(duel.DuelState.Notes.Dequeue(), viewportBounds, (float) lateForMs);
         }
-    }
-
-    private void SpawnNote(Note noteInfo, Rectangle viewportBounds)
-    {
-        var note = entityManager.CreateEntity();
-        entityManager.AddComponent(note, new ZOrderComponent { ZOrder = 3 });
-        entityManager.AddComponent(note, new TextureComponent
-        {
-            Texture = AssetsManager.Box,
-            Alignment = new Vector2(0.5f, 0.5f)
-        });
-        entityManager.AddComponent(note, new ScaleComponent { Scale = 0.8f });
-        entityManager.AddComponent(note, new TextComponent { Text = noteInfo.Key.ToString(), Font = AssetsManager.NoteFont});
-        entityManager.AddComponent(note, new ScreenPositionComponent
-        {
-            Position = new Vector2(viewportBounds.Width, 55f)
-        });
-        entityManager.AddComponent(note, new VelocityComponent { Velocity = new Vector2(-400, 0) });
-        entityManager.AddComponent(note, new NoteComponent { Key = noteInfo.Key });
     }
 }

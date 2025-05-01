@@ -4,15 +4,15 @@ using solo_slasher.component;
 
 namespace solo_slasher.system;
 
-public class KeyboardMovementSystem(EntityManager entityManager)
+public class KeyboardMovementSystem
 {
-    public void Update()
+    public void Update(GameTime gameTime)
     {
-        foreach (var entity in entityManager.GetEntitiesWith(
+        foreach (var entity in EntityManager.GetEntitiesWith(
                      typeof(KeyboardControllableComponent), typeof(PositionComponent)))
         {
-            var keyboardInput = entityManager.GetComponent<KeyboardControllableComponent>(entity);
-            var position = entityManager.GetComponent<PositionComponent>(entity);
+            var keyboardInput = EntityManager.GetComponent<KeyboardControllableComponent>(entity);
+            var position = EntityManager.GetComponent<PositionComponent>(entity);
 
             var delta = Vector2.Zero;
             if(Keyboard.GetState().IsKeyDown(keyboardInput.DownKey))
@@ -26,10 +26,23 @@ public class KeyboardMovementSystem(EntityManager entityManager)
 
             if (delta.X < 0)
             {
-                entityManager.AddComponent(entity, new MovementFlipComponent { Flip = true });
+                EntityManager.AddComponent(entity, new LookingDirectionComponent { Direction = LookDirection.Left });
             } else if (delta.X > 0)
             {
-                entityManager.AddComponent(entity, new MovementFlipComponent { Flip = false });
+                EntityManager.AddComponent(entity, new LookingDirectionComponent { Direction = LookDirection.Right });
+            }
+
+            if (delta.X != 0 || delta.Y != 0)
+            {
+                if(!EntityManager.HasComponent<WalkingAnimationComponent>(entity))
+                    EntityManager.AddComponent(entity, new WalkingAnimationComponent
+                    {
+                        StartedAt = gameTime.TotalGameTime,
+                    });
+            }
+            else
+            {
+                EntityManager.RemoveComponent<WalkingAnimationComponent>(entity);
             }
             
             position.Position += delta * keyboardInput.StepMultiplier;

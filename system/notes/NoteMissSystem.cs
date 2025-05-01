@@ -5,18 +5,18 @@ using solo_slasher.component.render;
 
 namespace solo_slasher.system.notes;
 
-public class NoteMissSystem(EntityManager entityManager)
+public class NoteMissSystem
 {
     public void Update()
     {
-        foreach (var entity in entityManager.GetEntitiesWith(typeof(NoteComponent), typeof(ScreenPositionComponent)))
+        foreach (var entity in EntityManager.GetEntitiesWith(typeof(NoteComponent), typeof(ScreenPositionComponent)))
         {
-            var position = entityManager.GetComponent<ScreenPositionComponent>(entity);
+            var position = EntityManager.GetComponent<ScreenPositionComponent>(entity);
 
-            if (entityManager.HasComponent<HitNoteComponent>(entity) ||
+            if (EntityManager.HasComponent<HitNoteComponent>(entity) ||
                 !(position.Position.X < Constants.LinePosition - Constants.NoteWidth)) continue;
-            entityManager.AddComponent(entity, new MissedNoteComponent());
-            entityManager.AddComponent(entity, new TintComponent {TintColor = new Color(Color.Red, 0.5f)});
+            EntityManager.AddComponent(entity, new MissedNoteComponent());
+            EntityManager.AddComponent(entity, new TintComponent {TintColor = new Color(Color.Red, 0.5f)});
         }
     }
 }
