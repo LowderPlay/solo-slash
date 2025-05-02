@@ -1,4 +1,6 @@
-﻿namespace solo_slasher;
+﻿using Microsoft.Xna.Framework;
+
+namespace solo_slasher;
 
 public static class Constants
 {
@@ -6,4 +8,5 @@ public static class Constants
     public const int NoteIgnoreDistance = 200;
     public const int NoteWidth = 50;
     public const float NoteFlyDuration = 2f;
+    public static readonly Point OffscreenDistance = new (100, 100);
 }

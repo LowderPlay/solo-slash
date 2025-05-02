@@ -13,7 +13,7 @@ public static class PlayerPrefab
         var player = EntityManager.CreateEntity();
         EntityManager.AddComponent(player, new PositionComponent());
         EntityManager.AddComponent(player, new ScaleComponent { Scale = 2f });
-        EntityManager.AddComponent(player, new ZOrderComponent { ZOrder = 1 });
+        // EntityManager.AddComponent(player, new ZOrderComponent { ZOrder = 1 });
         EntityManager.AddComponent(player, new SheetIndexComponent { X = 0, Y = 0 });
         EntityManager.AddComponent(player, new RenderPipelineComponent(RenderPipeline));
         
@@ -42,6 +42,13 @@ public static class PlayerPrefab
                 sheetIndex.Y = 0;
             }
         }
+
+        yield return new TextureOperation
+        {
+            Texture = Assets.Shadow,
+            Alignment = new Vector2(0.5f, 0.5f),
+        };
+        
         yield return new SpritesheetOperation
         {
             Sheet = Assets.Player,

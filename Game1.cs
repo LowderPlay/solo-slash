@@ -13,10 +13,14 @@ namespace solo_slasher;
 
 public class Game1 : Game
 {
+    private PerformanceTracker _performanceTracker;
+    
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
     private RenderSystem _renderSystem;
     private RenderPipelineBuilderSystem _renderPipelineBuilderSystem;
+    
+    private MapFillerSystem _mapFillerSystem;
     
     private KeyboardMovementSystem _keyboardMovementSystem;
     private DuelStartSystem _duelStartSystem;
@@ -29,6 +33,7 @@ public class Game1 : Game
 
     public Game1()
     {
+        _performanceTracker = new PerformanceTracker();
         _graphics = new GraphicsDeviceManager(this);
         // TODO: move to settings?
         _graphics.PreferredBackBufferWidth = 1280;
@@ -40,6 +45,7 @@ public class Game1 : Game
 
     protected override void Initialize()
     {
+        _mapFillerSystem = new MapFillerSystem();
         _keyboardMovementSystem = new KeyboardMovementSystem();
         _keyboardHitCheckSystem = new KeyboardHitCheckSystem();
         _duelStartSystem = new DuelStartSystem();
@@ -56,7 +62,8 @@ public class Game1 : Game
         Assets.LoadAssets(Content, GraphicsDevice);
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-        MapPrefab.Create();
+        // MapPrefab.Create();
+        DebugInfoPrefab.Create(_performanceTracker);
         PlayerPrefab.Create();
         EnemyPrefab.Create();
 
@@ -67,23 +74,26 @@ public class Game1 : Game
 
     protected override void Update(GameTime gameTime)
     {
+        _performanceTracker.SetUpdateDelta(gameTime.ElapsedGameTime.TotalSeconds);
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
 
-        _renderPipelineBuilderSystem.Update(gameTime);
+        _mapFillerSystem.Update();
         _keyboardMovementSystem.Update(gameTime);
         _keyboardHitCheckSystem.Update();
         _duelStartSystem.Update(gameTime);
         _velocityMoveSystem.Update(gameTime);
         _uiSystem.Update(gameTime);
         _noteMissSystem.Update();
+        _renderPipelineBuilderSystem.Update(gameTime);
 
         base.Update(gameTime);
     }
 
     protected override void Draw(GameTime gameTime)
     {
-        GraphicsDevice.Clear(Color.CornflowerBlue);
+        _performanceTracker.SetDrawDelta(gameTime.ElapsedGameTime.TotalSeconds);
+        GraphicsDevice.Clear(Color.ForestGreen);
 
         _renderSystem.Render(GraphicsDevice.Viewport.Bounds, gameTime);
         _noteSpawnerSystem.HandleNoteSpawn(gameTime, GraphicsDevice.Viewport.Bounds);

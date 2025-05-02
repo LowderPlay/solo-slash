@@ -9,6 +9,8 @@ public static class EntityManager {
     private static readonly Dictionary<long, Entity> Entities = new();
     private static readonly Dictionary<Type, Dictionary<long, IComponent>> Components = new();
     private static long _nextEntityId;
+    
+    public static long Count => Entities.Count;
 
     public static Entity CreateEntity() {
         var id = _nextEntityId++;

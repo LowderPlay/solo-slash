@@ -39,6 +39,11 @@ public class RenderSystem(SpriteBatch spriteBatch)
             {
                 drawPosition += positionComponent.Position - cameraPosition;
             }
+            
+            if (!viewportBounds.Intersects(new Rectangle(
+                    drawPosition.ToPoint() - Constants.OffscreenDistance / new Point(2, 2), 
+                    Constants.OffscreenDistance)))
+                continue;
 
             var effects = EntityManager.TryGetComponent<EffectsComponent>(entity, out var effectsComponent) ? 
                 effectsComponent.Effects : SpriteEffects.None;

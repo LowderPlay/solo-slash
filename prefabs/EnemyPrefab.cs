@@ -17,13 +17,20 @@ public static class EnemyPrefab
             Position = new Vector2(256, 256)
         });
         EntityManager.AddComponent(enemy, new ScaleComponent { Scale = 2f });
-        EntityManager.AddComponent(enemy, new ZOrderComponent { ZOrder = 1 });
+        // EntityManager.AddComponent(enemy, new ZOrderComponent { ZOrder = 1 });
         EntityManager.AddComponent(enemy, new RenderPipelineComponent(RenderPipeline));
     }
 
     private static IEnumerable<IRenderOperation> RenderPipeline(GameTime gameTime, Entity entity)
     {
-        yield return new TextureOperation {
+        yield return new TextureOperation
+        {
+            Texture = Assets.Shadow,
+            Alignment = new Vector2(0.5f, 0.5f),
+        };
+        
+        yield return new TextureOperation 
+        {
             Texture = Assets.Mushroom,
             Alignment = new Vector2(0.5f, 1f)
         };
