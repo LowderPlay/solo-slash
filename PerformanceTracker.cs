@@ -4,33 +4,33 @@ namespace solo_slasher;
 
 public class PerformanceTracker
 {
-    private const int windowSize = 100;
+    private const int SampleWindowSize = 30;
     
-    private Queue<double> drawTimes = new();
+    private readonly Queue<double> _drawTimes = new();
     private double _drawTotal;
-    private Queue<double> updateTimes = new();
+    private readonly Queue<double> _updateTimes = new();
     private double _updateTotal;
     
     public void SetDrawDelta(double drawDelta)
     {
-        drawTimes.Enqueue(drawDelta);
+        _drawTimes.Enqueue(drawDelta);
         _drawTotal += drawDelta;
-        if (drawTimes.Count >= windowSize)
+        while (_drawTimes.Count > SampleWindowSize)
         {
-            _drawTotal -= drawTimes.Dequeue();
+            _drawTotal -= _drawTimes.Dequeue();
         }
     }
 
     public void SetUpdateDelta(double updateDelta)
     {
-        updateTimes.Enqueue(updateDelta);
+        _updateTimes.Enqueue(updateDelta);
         _updateTotal += updateDelta;
-        if (updateTimes.Count >= windowSize)
+        while (_updateTimes.Count > SampleWindowSize)
         {
-            _updateTotal -= updateTimes.Dequeue();
+            _updateTotal -= _updateTimes.Dequeue();
         }
     }
 
-    public double UpdatesPerSecond => _updateTotal == 0 ? 0 : updateTimes.Count / _updateTotal;
-    public double FramesPerSecond => _drawTotal == 0 ? 0 : drawTimes.Count / _drawTotal;
+    public double UpdatesPerSecond => _updateTotal == 0 ? 0 : _updateTimes.Count / _updateTotal;
+    public double FramesPerSecond => _drawTotal == 0 ? 0 : _drawTimes.Count / _drawTotal;
 }

@@ -23,7 +23,7 @@ public static class NotePrefab
             Position = new Vector2(spawnPosition, 55f)
         });
         
-        EntityManager.AddComponent(note, new RenderPipelineComponent((time, entity) => RenderPipeline(noteInfo)));
+        EntityManager.AddComponent(note, new RenderPipelineComponent((_, _) => RenderPipeline(noteInfo)));
         
         
         EntityManager.AddComponent(note, new VelocityComponent { Velocity = new Vector2(-velocity, 0) });

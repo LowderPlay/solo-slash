@@ -9,7 +9,7 @@ public class SpritesheetOperation : IRenderOperation
     public (int width, int height) Size = (1, 1);
     public Vector2 Alignment = new(0f, 0f);
     
-    public void Render(SpriteBatch spriteBatch, Entity entity, Vector2 position, float scale, Color tint, SpriteEffects effects)
+    public void Render(SpriteBatch spriteBatch, Entity entity, Vector2 position, float scale, Color tint, SpriteEffects effects, float rotation)
     {
         var sourceSize = new Vector2(Sheet.Width / Size.width, Sheet.Height / Size.height);
         
@@ -20,8 +20,9 @@ public class SpritesheetOperation : IRenderOperation
             new Vector2(i.X, i.Y) : Vector2.Zero;
 
         var alignedLocation = position - spriteSize * Alignment;
+        alignedLocation.Round();
         spriteBatch.Draw(Sheet, new Rectangle(alignedLocation.ToPoint(), spriteSize.ToPoint()), 
-            new Rectangle((sourceSize * index).ToPoint(), sourceSize.ToPoint()), tint, 0f, 
+            new Rectangle((sourceSize * index).ToPoint(), sourceSize.ToPoint()), tint, rotation, 
             Vector2.Zero, effects, 1f);
     }
     

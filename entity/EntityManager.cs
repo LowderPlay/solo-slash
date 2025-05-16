@@ -68,20 +68,22 @@ public static class EntityManager {
         Components[typeof(T)].Remove(entity.Id);
     }
 
-    public static List<Entity> GetEntitiesWith<T>() where T : IComponent
+    public static IEnumerable<Entity> GetEntitiesWith<T>() where T : IComponent
     {
-        return !Components.ContainsKey(typeof(T)) ? [] : 
-            Components[typeof(T)].Keys
-                .Select(id => Entities[id])
-                .ToList();
+        return !Components.ContainsKey(typeof(T))
+            ? []
+            : Components[typeof(T)].Keys
+                .Select(id => Entities[id]);
     }
     
     public static List<Entity> GetEntitiesWith(params Type[] requiredComponents) {
         if (requiredComponents.Length == 0) return [];
 
-        var validEntityIds = new HashSet<long>(Entities.Keys);
+        var validEntityIds = new HashSet<long>(
+            Components.TryGetValue(requiredComponents[0], out var firstComponent) 
+                ? firstComponent.Keys : []);
 
-        foreach (var componentType in requiredComponents) {
+        foreach (var componentType in requiredComponents.Skip(1)) {
             if (!Components.TryGetValue(componentType, out var componentEntities)) return [];
             validEntityIds.IntersectWith(componentEntities.Keys);
         }
@@ -96,9 +98,6 @@ public static class EntityManager {
             if (Components.TryGetValue(componentType, out var componentEntities)) 
                 validEntityIds.UnionWith(componentEntities.Keys);
         }
-        
-        // if (!_components.TryGetValue(typeof(T), out var requiredComponentEntities)) return [];
-        // validEntityIds.IntersectWith(requiredComponentEntities.Keys);
 
         return validEntityIds.Select(id => Entities[id]).ToList();
     }

@@ -13,18 +13,18 @@ public class NoteSpawnerSystem
 {
     public void HandleNoteSpawn(GameTime gameTime, Rectangle viewportBounds)
     {
-        if(!EntityManager.TryGetFirstEntityWith<DuelingComponent>(out var player)) return;
-        var duel = EntityManager.GetComponent<DuelingComponent>(player);
+        if(!EntityManager.TryGetFirstEntityWith<PlayingTrackComponent>(out var player)) return;
+        var track = EntityManager.GetComponent<PlayingTrackComponent>(player);
 
-        var msPerBeat = (double)duel.DuelState.Bpm / (60 * 1000);
-        var arriveTime = (gameTime.TotalGameTime - duel.DuelState.StartTime).TotalMilliseconds + Constants.NoteFlyDuration * 1000;
+        var msPerBeat = (double)track.TrackState.Bpm / (60 * 1000);
+        var arriveTime = (gameTime.TotalGameTime - track.StartTime).TotalMilliseconds + Constants.NoteFlyDuration * 1000;
         var beatTime = arriveTime * msPerBeat;
         
-        while (duel.DuelState.Notes.TryPeek(out var note) && note.TimeInBeats <= beatTime)
+        while (track.TrackState.Notes.TryPeek(out var note) && note.TimeInBeats <= beatTime)
         {
             var lateForMs = (beatTime - note.TimeInBeats) / msPerBeat;
             Console.WriteLine($"Late for {lateForMs}ms");
-            NotePrefab.Create(duel.DuelState.Notes.Dequeue(), viewportBounds, (float) lateForMs);
+            NotePrefab.Create(track.TrackState.Notes.Dequeue(), viewportBounds, (float) lateForMs);
         }
     }
 }

@@ -8,5 +8,5 @@ public class KeyboardControllableComponent : IComponent
     public Keys LeftKey = Keys.A;
     public Keys DownKey = Keys.S;
     public Keys RightKey = Keys.D;
-    public int StepMultiplier = 1;
+    public float StepsPerSecond;
 }

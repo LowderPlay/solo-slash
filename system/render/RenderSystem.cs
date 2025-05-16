@@ -1,8 +1,6 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using rhythm_cs2;
 using solo_slasher.component;
 using solo_slasher.component.render;
 
@@ -15,8 +13,8 @@ public class RenderSystem(SpriteBatch spriteBatch)
         spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
 
         var cameraPosition = Vector2.Zero;
-        var camera = EntityManager.GetEntitiesWith(typeof(PositionComponent), typeof(CameraOriginComponent));
-        if (camera.Count > 0 && EntityManager.TryGetComponent<PositionComponent>(camera.First(), out var cameraPositionComponent))
+        if (EntityManager.TryGetFirstEntityWith<CameraOriginComponent>(out var camera) && 
+            EntityManager.TryGetComponent<PositionComponent>(camera, out var cameraPositionComponent))
         {
             cameraPosition = cameraPositionComponent.Position;
         }
@@ -51,10 +49,12 @@ public class RenderSystem(SpriteBatch spriteBatch)
                 tintComponent.TintColor : Color.White;
             var scale = EntityManager.TryGetComponent<ScaleComponent>(entity, out var scaleComponent) ? 
                 scaleComponent.Scale : 1;
+            var rotation = EntityManager.TryGetComponent<RotationComponent>(entity, out var rotationComponent) ? 
+                rotationComponent.Radians : 0;
 
             while (EntityManager.GetComponent<RenderOperationsComponent>(entity).RenderOperations.TryDequeue(out var operation))
             { 
-                operation.Render(spriteBatch, entity, drawPosition, scale, tint, effects);
+                operation.Render(spriteBatch, entity, drawPosition, scale, tint, effects, rotation);
             }
         }
         

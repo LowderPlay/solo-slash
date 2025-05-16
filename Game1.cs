@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using rhythm_cs2;
@@ -13,7 +14,7 @@ namespace solo_slasher;
 
 public class Game1 : Game
 {
-    private PerformanceTracker _performanceTracker;
+    private readonly PerformanceTracker _performanceTracker;
     
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
@@ -30,6 +31,9 @@ public class Game1 : Game
     private NoteSpawnerSystem _noteSpawnerSystem;
     private NoteMissSystem _noteMissSystem;
     private KeyboardHitCheckSystem _keyboardHitCheckSystem;
+    private EnemyAiSystem _enemyAiSystem;
+    private EnemySpawnSystem _enemySpawnSystem;
+    private ProjectileHitSystem _projectileHitSystem;
 
     public Game1()
     {
@@ -38,6 +42,9 @@ public class Game1 : Game
         // TODO: move to settings?
         _graphics.PreferredBackBufferWidth = 1280;
         _graphics.PreferredBackBufferHeight = 720;
+        
+        // IsFixedTimeStep = false;
+        // _graphics.SynchronizeWithVerticalRetrace = false;
 
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
@@ -50,6 +57,9 @@ public class Game1 : Game
         _keyboardHitCheckSystem = new KeyboardHitCheckSystem();
         _duelStartSystem = new DuelStartSystem();
         _noteSpawnerSystem = new NoteSpawnerSystem();
+        _enemyAiSystem = new EnemyAiSystem();
+        _enemySpawnSystem = new EnemySpawnSystem();
+        _projectileHitSystem = new ProjectileHitSystem();
         _velocityMoveSystem = new VelocityMoveSystem();
         _noteMissSystem = new NoteMissSystem();
         _uiSystem = new UiSystem();
@@ -62,10 +72,8 @@ public class Game1 : Game
         Assets.LoadAssets(Content, GraphicsDevice);
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-        // MapPrefab.Create();
         DebugInfoPrefab.Create(_performanceTracker);
         PlayerPrefab.Create();
-        EnemyPrefab.Create();
 
         _uiSystem.Initialize(GraphicsDevice.Viewport.Bounds);
         _renderSystem = new RenderSystem(_spriteBatch);
@@ -80,8 +88,11 @@ public class Game1 : Game
 
         _mapFillerSystem.Update();
         _keyboardMovementSystem.Update(gameTime);
-        _keyboardHitCheckSystem.Update();
+        _keyboardHitCheckSystem.Update(gameTime);
         _duelStartSystem.Update(gameTime);
+        _enemyAiSystem.Update(gameTime);
+        _enemySpawnSystem.Update();
+        _projectileHitSystem.Update();
         _velocityMoveSystem.Update(gameTime);
         _uiSystem.Update(gameTime);
         _noteMissSystem.Update();
@@ -93,7 +104,7 @@ public class Game1 : Game
     protected override void Draw(GameTime gameTime)
     {
         _performanceTracker.SetDrawDelta(gameTime.ElapsedGameTime.TotalSeconds);
-        GraphicsDevice.Clear(Color.ForestGreen);
+        GraphicsDevice.Clear(new Color(95, 162, 69));
 
         _renderSystem.Render(GraphicsDevice.Viewport.Bounds, gameTime);
         _noteSpawnerSystem.HandleNoteSpawn(gameTime, GraphicsDevice.Viewport.Bounds);

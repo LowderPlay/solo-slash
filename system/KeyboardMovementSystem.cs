@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using solo_slasher.component;
+using solo_slasher.component.animations;
 
 namespace solo_slasher.system;
 
@@ -24,28 +25,28 @@ public class KeyboardMovementSystem
             if(Keyboard.GetState().IsKeyDown(keyboardInput.RightKey))
                 delta += Vector2.UnitX;
 
+            if (delta == Vector2.Zero)
+            {
+                EntityManager.RemoveComponent<PlayerWalkingAnimationComponent>(entity);
+                return;
+            }
+            
+            delta.Normalize();
+            
             if (delta.X < 0)
             {
                 EntityManager.AddComponent(entity, new LookingDirectionComponent { Direction = LookDirection.Left });
-            } else if (delta.X > 0)
+            } 
+            else if (delta.X > 0)
             {
                 EntityManager.AddComponent(entity, new LookingDirectionComponent { Direction = LookDirection.Right });
             }
 
-            if (delta.X != 0 || delta.Y != 0)
-            {
-                if(!EntityManager.HasComponent<WalkingAnimationComponent>(entity))
-                    EntityManager.AddComponent(entity, new WalkingAnimationComponent
-                    {
-                        StartedAt = gameTime.TotalGameTime,
-                    });
-            }
-            else
-            {
-                EntityManager.RemoveComponent<WalkingAnimationComponent>(entity);
-            }
+            if(!EntityManager.HasComponent<PlayerWalkingAnimationComponent>(entity))
+                EntityManager.AddComponent(entity, new PlayerWalkingAnimationComponent(gameTime.TotalGameTime));
             
-            position.Position += delta * keyboardInput.StepMultiplier;
+            position.Position += delta * keyboardInput.StepsPerSecond * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            position.Position.Round();
         }
     }
 }

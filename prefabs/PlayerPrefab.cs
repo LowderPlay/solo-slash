@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using rhythm_cs2;
 using solo_slasher.component;
+using solo_slasher.component.animations;
 using solo_slasher.component.render;
 
 namespace solo_slasher.prefabs;
@@ -17,14 +18,13 @@ public static class PlayerPrefab
         EntityManager.AddComponent(player, new SheetIndexComponent { X = 0, Y = 0 });
         EntityManager.AddComponent(player, new RenderPipelineComponent(RenderPipeline));
         
-        EntityManager.AddComponent(player, new KeyboardControllableComponent { StepMultiplier = 4 });
+        EntityManager.AddComponent(player, new KeyboardControllableComponent { StepsPerSecond = 250 });
         EntityManager.AddComponent(player, new CameraOriginComponent());
+        EntityManager.AddComponent(player, new HealthComponent());
     }
 
     private static IEnumerable<IRenderOperation> RenderPipeline(GameTime gameTime, Entity entity)
     {
-        const int frameInterval = 100;
-        
         if (EntityManager.TryGetComponent<SheetIndexComponent>(entity, out var sheetIndex))
         {
             if (EntityManager.TryGetComponent<LookingDirectionComponent>(entity, out var look))
@@ -32,10 +32,9 @@ public static class PlayerPrefab
                 sheetIndex.X = look.Direction == LookDirection.Left ? 0 : 1;
             }
 
-            if (EntityManager.TryGetComponent<WalkingAnimationComponent>(entity, out var walking))
+            if (EntityManager.TryGetComponent<PlayerWalkingAnimationComponent>(entity, out var walking))
             {
-                var frame = (int) (gameTime.TotalGameTime - walking.StartedAt).TotalMilliseconds / frameInterval;
-                sheetIndex.Y = 1 + frame % 2;
+                sheetIndex.Y = 1 + walking.GetCurrentFrame(gameTime);
             }
             else
             {
@@ -55,5 +54,6 @@ public static class PlayerPrefab
             Size = (2, 3),
             Alignment = new Vector2(0.5f, 1f)
         };
+        yield return new HealthBarOperation();
     }
 }

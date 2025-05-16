@@ -3,9 +3,8 @@ using System.Collections.Generic;
 
 namespace solo_slasher.duel;
 
-public class DuelState
+public class TrackState
 {
-    public int Bpm = 120;
+    public double Bpm = 120;
     public Queue<Note> Notes;
-    public TimeSpan StartTime;
 }

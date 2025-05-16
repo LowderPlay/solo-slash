@@ -9,18 +9,17 @@ namespace solo_slasher.system;
 
 public class MapFillerSystem
 {
-    private readonly Vector2 chunkSize = new (64, 64); 
-    private readonly Vector2 fillChunks = new (15, 10);
+    private readonly Vector2 _fillChunks = new (15, 15);
     
-    private HashSet<Point> filledChunks = [];
+    private readonly HashSet<Point> _filledChunks = [];
     
     public void Update()
     {
         if(!EntityManager.TryGetFirstEntityWith<CameraOriginComponent>(out var camera)) return;
         var position = EntityManager.GetComponent<PositionComponent>(camera);
         var fov = new Rectangle(
-            (position.Position / chunkSize - fillChunks).ToPoint(), 
-            (fillChunks * 2).ToPoint()
+            (position.Position / Constants.ChunkSize - _fillChunks).ToPoint(), 
+            (_fillChunks * 2).ToPoint()
             );
         
         for (var x = fov.Left; x < fov.Right; x++)
@@ -28,9 +27,9 @@ public class MapFillerSystem
             for (var y = fov.Top; y < fov.Bottom; y++)
             {
                 var chunk = new Point(x, y);
-                if (filledChunks.Contains(chunk)) continue;
-                MapPrefab.GenerateChunk(chunk.ToVector2() * chunkSize);
-                filledChunks.Add(chunk);
+                if (_filledChunks.Contains(chunk)) continue;
+                MapPrefab.GenerateChunk(chunk.ToVector2() * Constants.ChunkSize);
+                _filledChunks.Add(chunk);
             }
         }
     }

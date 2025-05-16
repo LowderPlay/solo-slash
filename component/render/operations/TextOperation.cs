@@ -9,7 +9,7 @@ public class TextOperation : IRenderOperation
     public string Text;
     public Vector2 Alignment = new(0.5f, 0.5f);
     
-    public void Render(SpriteBatch spriteBatch, Entity entity, Vector2 position, float scale, Color tint, SpriteEffects effects)
+    public void Render(SpriteBatch spriteBatch, Entity entity, Vector2 position, float scale, Color tint, SpriteEffects effects, float rotation)
     {
         var textSize = Font.MeasureString(Text) * scale;
                 

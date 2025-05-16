@@ -34,7 +34,7 @@ public class UiSystem
     {
         if (!EntityManager.TryGetFirstEntityWith<KeyboardControllableComponent>(out var player)) return;
 
-        if (EntityManager.HasComponent<DuelingComponent>(player))
+        if (EntityManager.HasComponent<PlayingTrackComponent>(player))
         {
             EntityManager.RemoveComponent<HiddenComponent>(duelBar);
         }
