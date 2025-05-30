@@ -13,4 +13,5 @@ public static class Constants
     public static readonly Vector2 ChunkSize = new (64, 64);
 
     public const int MaxEnemies = 15;
+    public const int TargetingEnemies = 5;
 }

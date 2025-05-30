@@ -5,7 +5,9 @@ using Microsoft.Xna.Framework.Input;
 using rhythm_cs2;
 using solo_slasher.component;
 using solo_slasher.component.render;
+using solo_slasher.component.render.pipelines;
 using solo_slasher.prefabs;
+using solo_slasher.prefabs.menus;
 using solo_slasher.system;
 using solo_slasher.system.notes;
 using solo_slasher.system.render;
@@ -25,7 +27,6 @@ public class Game1 : Game
     
     private KeyboardMovementSystem _keyboardMovementSystem;
     private DuelStartSystem _duelStartSystem;
-    private UiSystem _uiSystem;
     private VelocityMoveSystem _velocityMoveSystem;
     
     private NoteSpawnerSystem _noteSpawnerSystem;
@@ -34,6 +35,9 @@ public class Game1 : Game
     private EnemyAiSystem _enemyAiSystem;
     private EnemySpawnSystem _enemySpawnSystem;
     private ProjectileHitSystem _projectileHitSystem;
+    private MouseHandlerSystem _mouseHandlerSystem;
+    private MenuBuilderSystem _menuBuilderSystem;
+    private readonly Rectangle _screenSize;
 
     public Game1()
     {
@@ -42,7 +46,10 @@ public class Game1 : Game
         // TODO: move to settings?
         _graphics.PreferredBackBufferWidth = 1280;
         _graphics.PreferredBackBufferHeight = 720;
+        _graphics.HardwareModeSwitch = false;
         
+        
+        _screenSize = new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
         // IsFixedTimeStep = false;
         // _graphics.SynchronizeWithVerticalRetrace = false;
 
@@ -62,7 +69,8 @@ public class Game1 : Game
         _projectileHitSystem = new ProjectileHitSystem();
         _velocityMoveSystem = new VelocityMoveSystem();
         _noteMissSystem = new NoteMissSystem();
-        _uiSystem = new UiSystem();
+        _mouseHandlerSystem = new MouseHandlerSystem();
+        _menuBuilderSystem = new MenuBuilderSystem();
 
         base.Initialize();
     }
@@ -75,27 +83,34 @@ public class Game1 : Game
         DebugInfoPrefab.Create(_performanceTracker);
         PlayerPrefab.Create();
 
-        _uiSystem.Initialize(GraphicsDevice.Viewport.Bounds);
-        _renderSystem = new RenderSystem(_spriteBatch);
+        ShopMenuPrefab.Create();
+        SettingsMenuPrefab.Create(_graphics, Exit);
+        SongMenuPrefab.Create(GraphicsDevice);
+        NoteBarPrefab.Create(GraphicsDevice.Viewport.Bounds);
+
+        _renderSystem = new RenderSystem(_spriteBatch, _screenSize);
         _renderPipelineBuilderSystem = new RenderPipelineBuilderSystem();
     }
 
     protected override void Update(GameTime gameTime)
     {
         _performanceTracker.SetUpdateDelta(gameTime.ElapsedGameTime.TotalSeconds);
-        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-            Exit();
+        // if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+        //     Exit();
 
         _mapFillerSystem.Update();
+        _duelStartSystem.Update(gameTime);
+        _noteSpawnerSystem.HandleNoteSpawn(gameTime, _screenSize);
+        _mouseHandlerSystem.Update(_screenSize, GraphicsDevice.Viewport.Bounds);
         _keyboardMovementSystem.Update(gameTime);
         _keyboardHitCheckSystem.Update(gameTime);
-        _duelStartSystem.Update(gameTime);
         _enemyAiSystem.Update(gameTime);
         _enemySpawnSystem.Update();
         _projectileHitSystem.Update();
         _velocityMoveSystem.Update(gameTime);
-        _uiSystem.Update(gameTime);
         _noteMissSystem.Update();
+        
+        _menuBuilderSystem.Update();
         _renderPipelineBuilderSystem.Update(gameTime);
 
         base.Update(gameTime);
@@ -104,10 +119,8 @@ public class Game1 : Game
     protected override void Draw(GameTime gameTime)
     {
         _performanceTracker.SetDrawDelta(gameTime.ElapsedGameTime.TotalSeconds);
-        GraphicsDevice.Clear(new Color(95, 162, 69));
 
         _renderSystem.Render(GraphicsDevice.Viewport.Bounds, gameTime);
-        _noteSpawnerSystem.HandleNoteSpawn(gameTime, GraphicsDevice.Viewport.Bounds);
 
         base.Draw(gameTime);
     }

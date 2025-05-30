@@ -28,7 +28,9 @@ public static class DebugInfoPrefab
 
     private static IEnumerable<IRenderOperation> RenderPipeline(GameTime gameTime, Entity entity)
     {
-        EntityManager.TryGetFirstEntityWith<CameraOriginComponent>(out var player);
+        if(!EntityManager.TryGetFirstEntityWith<CameraOriginComponent>(out var player) || 
+           !EntityManager.HasComponent<PerformanceTrackerShownComponent>(player)) yield break;
+        
         var position = EntityManager.GetComponent<PositionComponent>(player);
         var tracker = EntityManager.GetComponent<AttachedPerformanceTrackerComponent>(entity);
         var text = $"FPS: {Math.Truncate(tracker.PerformanceTracker.FramesPerSecond * 100) / 100}\n" +

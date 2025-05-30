@@ -35,6 +35,9 @@ public class KeyboardHitCheckSystem
 
             if (EntityManager.TryGetFirstEntityWith<CameraOriginComponent>(out var player))
             {
+                if (EntityManager.TryGetComponent<HealthComponent>(player, out var healthComponent))
+                    healthComponent.AddHealth(5);
+                
                 var playerPosition = EntityManager.GetComponent<PositionComponent>(player).Position;
                 foreach (var target in EntityManager.GetEntitiesWith(typeof(EnemyAiComponent), typeof(PositionComponent)))
                 {

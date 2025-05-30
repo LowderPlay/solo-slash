@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using solo_slasher.component;
@@ -6,10 +7,29 @@ using solo_slasher.component.render;
 
 namespace solo_slasher.system.render;
 
-public class RenderSystem(SpriteBatch spriteBatch)
+public class RenderSystem(SpriteBatch spriteBatch, Rectangle screenSize)
 {
+    private readonly RenderTarget2D _gameScreen = new (spriteBatch.GraphicsDevice, screenSize.Width, screenSize.Height);
+    
     public void Render(Rectangle viewportBounds, GameTime gameTime)
     {
+        foreach (var entity in EntityManager.GetEntitiesWith<InternalCanvasComponent>())
+        {
+            var canvasComponent = EntityManager.GetComponent<InternalCanvasComponent>(entity);
+            
+            canvasComponent.Target ??= new RenderTarget2D(spriteBatch.GraphicsDevice, canvasComponent.Size.X, canvasComponent.Size.Y);
+            
+            spriteBatch.GraphicsDevice.SetRenderTarget(canvasComponent.Target);
+            spriteBatch.GraphicsDevice.Clear(Color.Transparent);
+            
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp);
+            canvasComponent.InternalRender.Invoke(spriteBatch, entity);
+            spriteBatch.End();
+            
+        }
+        
+        spriteBatch.GraphicsDevice.SetRenderTarget(_gameScreen);
+        spriteBatch.GraphicsDevice.Clear(new Color(95, 162, 69));
         spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
 
         var cameraPosition = Vector2.Zero;
@@ -19,7 +39,7 @@ public class RenderSystem(SpriteBatch spriteBatch)
             cameraPosition = cameraPositionComponent.Position;
         }
         
-        var screenOrigin = new Vector2(viewportBounds.Width / 2f, viewportBounds.Height / 2f);
+        var screenOrigin = new Vector2(screenSize.Width / 2f, screenSize.Height / 2f);
 
         foreach (var entity in EntityManager.GetEntitiesWith<RenderOperationsComponent>()
                      .OrderBy(e => EntityManager.TryGetComponent<ZOrderComponent>(e, out var z) ? z.ZOrder : 0)
@@ -38,7 +58,7 @@ public class RenderSystem(SpriteBatch spriteBatch)
                 drawPosition += positionComponent.Position - cameraPosition;
             }
             
-            if (!viewportBounds.Intersects(new Rectangle(
+            if (!screenSize.Intersects(new Rectangle(
                     drawPosition.ToPoint() - Constants.OffscreenDistance / new Point(2, 2), 
                     Constants.OffscreenDistance)))
                 continue;
@@ -58,6 +78,11 @@ public class RenderSystem(SpriteBatch spriteBatch)
             }
         }
         
+        spriteBatch.End();
+        
+        spriteBatch.GraphicsDevice.SetRenderTarget(null);
+        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, SamplerState.PointClamp);
+        spriteBatch.Draw(_gameScreen, viewportBounds, Color.White);
         spriteBatch.End();
     }
 }

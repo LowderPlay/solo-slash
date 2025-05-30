@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using solo_slasher.component;
 using solo_slasher.component.render;
@@ -28,7 +29,13 @@ public class MapFillerSystem
             {
                 var chunk = new Point(x, y);
                 if (_filledChunks.Contains(chunk)) continue;
-                MapPrefab.GenerateChunk(chunk.ToVector2() * Constants.ChunkSize);
+                var chunkCoords = chunk.ToVector2() * Constants.ChunkSize;
+                
+                if (EntityManager.GetEntitiesWith<UiStructureComponent>()
+                    .Select(e => EntityManager.GetComponent<PositionComponent>(e).Position)
+                    .Select(p => (p - chunkCoords).Length())
+                    .DefaultIfEmpty(300).Min() > 200)
+                    MapPrefab.GenerateChunk(chunkCoords);
                 _filledChunks.Add(chunk);
             }
         }

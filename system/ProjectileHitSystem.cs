@@ -23,7 +23,7 @@ public class ProjectileHitSystem
             
             if (EntityManager.TryGetComponent<HealthComponent>(projectile.Target, out var healthComponent))
             {
-                healthComponent.Health -= projectile.Damage;
+                healthComponent.AddHealth(-projectile.Damage);
                 if (healthComponent.Health <= 0)
                 {
                     EntityManager.DestroyEntity(projectile.Target);

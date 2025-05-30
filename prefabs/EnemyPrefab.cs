@@ -64,7 +64,7 @@ public static class EnemyPrefab
         }
         yield return new TextureOperation
         {
-            Texture = Assets.Shadow,
+            Sheet = Assets.Shadow,
             Alignment = new Vector2(0.5f, 0.5f),
         };
 

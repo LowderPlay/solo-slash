@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Numerics;
 using Microsoft.Xna.Framework;
 using solo_slasher.component;
 using solo_slasher.component.render;
@@ -34,16 +33,17 @@ public class EnemyAiSystem
             {
                 aiState.LastHit = gameTime.TotalGameTime;
                 if (EntityManager.TryGetComponent<HealthComponent>(player, out var healthComponent))
-                    healthComponent.Health -= 5;
+                    healthComponent.AddHealth(-5);
             }
             
-            if (distance < aiState.StayDistance || (closeEnemies >= 5 && distance > 1000)) 
+            if (distance < aiState.StayDistance || (closeEnemies >= Constants.TargetingEnemies && distance > 1000)) 
                 EntityManager.AddComponent(enemy, new VelocityComponent { Velocity = Vector2.Zero });
             else
             {
                 var position = EntityManager.GetComponent<PositionComponent>(enemy).Position;
-                var velocity = Vector2.Normalize(playerPosition - position) * 180f;
-                velocity += Vector2.Rotate(velocity * 2, (float) Math.PI / 2 * (aiState.Noise.Noise(-position) - 0.5f)) * (aiState.Noise.Noise(position) - 0.5f);
+                var velocity = Vector2.Normalize(playerPosition - position) * aiState.Velocity;
+                velocity += Vector2.Rotate(
+                    velocity * 2, (float) Math.PI / 2 * (aiState.Noise.Noise(-position) - 0.5f)) * (aiState.Noise.Noise(position) - 0.5f);
                 velocity.Round();
                 EntityManager.AddComponent(enemy, new VelocityComponent { Velocity = velocity });
             }

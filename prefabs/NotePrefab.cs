@@ -5,6 +5,7 @@ using solo_slasher.component;
 using solo_slasher.component.notes;
 using solo_slasher.component.render;
 using solo_slasher.duel;
+using solo_slasher.system;
 
 namespace solo_slasher.prefabs;
 
@@ -17,10 +18,13 @@ public static class NotePrefab
         
         var note = EntityManager.CreateEntity();
         EntityManager.AddComponent(note, new ZOrderComponent { ZOrder = 3 });
-        EntityManager.AddComponent(note, new ScaleComponent { Scale = 0.8f });
+        EntityManager.AddComponent(note, new ScaleComponent
+        {
+            Scale = 0.6f * (NoteBarPrefab.Scale * Assets.Line.Height / Assets.Box.Height)
+        });
         EntityManager.AddComponent(note, new ScreenPositionComponent
         {
-            Position = new Vector2(spawnPosition, 55f)
+            Position = new Vector2(spawnPosition, NoteBarPrefab.Scale * Assets.Line.Height / 2)
         });
         
         EntityManager.AddComponent(note, new RenderPipelineComponent((_, _) => RenderPipeline(noteInfo)));
@@ -34,7 +38,7 @@ public static class NotePrefab
     {
         yield return new TextureOperation
         {
-            Texture = Assets.Box,
+            Sheet = Assets.Box,
             Alignment = new Vector2(0.5f, 0.5f)
         };
         yield return new TextOperation

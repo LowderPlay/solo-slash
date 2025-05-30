@@ -19,7 +19,7 @@ public class NoteMissSystem
             if (!(position.Position.X < Constants.LinePosition - Constants.NoteWidth)) continue;
             EntityManager.AddComponent(entity, new MissedNoteComponent());
             EntityManager.AddComponent(entity, new TintComponent {TintColor = new Color(Color.Red, 0.5f)});
-            EntityManager.GetComponent<HealthComponent>(player).Health -= 5;
+            EntityManager.GetComponent<HealthComponent>(player).AddHealth(-5);
         }
     }
 }

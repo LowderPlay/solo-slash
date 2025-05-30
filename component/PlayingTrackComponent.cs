@@ -6,5 +6,5 @@ namespace solo_slasher.component;
 public class PlayingTrackComponent : IComponent
 {
     public TrackState TrackState;
-    public TimeSpan StartTime;
+    public TimeSpan? StartTime = null;
 }

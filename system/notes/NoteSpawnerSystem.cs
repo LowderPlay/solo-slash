@@ -16,8 +16,8 @@ public class NoteSpawnerSystem
         if(!EntityManager.TryGetFirstEntityWith<PlayingTrackComponent>(out var player)) return;
         var track = EntityManager.GetComponent<PlayingTrackComponent>(player);
 
-        var msPerBeat = (double)track.TrackState.Bpm / (60 * 1000);
-        var arriveTime = (gameTime.TotalGameTime - track.StartTime).TotalMilliseconds + Constants.NoteFlyDuration * 1000;
+        var msPerBeat = track.TrackState.Bpm / (60 * 1000);
+        var arriveTime = (gameTime.TotalGameTime - track.StartTime)?.TotalMilliseconds + Constants.NoteFlyDuration * 1000;
         var beatTime = arriveTime * msPerBeat;
         
         while (track.TrackState.Notes.TryPeek(out var note) && note.TimeInBeats <= beatTime)

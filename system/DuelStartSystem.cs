@@ -13,20 +13,12 @@ public class DuelStartSystem
 {
     public void Update(GameTime gameTime)
     {
-        if(!EntityManager.TryGetFirstEntityWith<KeyboardControllableComponent>(out var player)) return;
-        
-        if (EntityManager.HasComponent<PlayingTrackComponent>(player) || !Keyboard.GetState().IsKeyDown(Keys.R)) return;
-        
-        var track = TrackReader.ReadFile(@"E:\JetbrainsProjects\RustRover\slasher-beatmaps\test.zip");
-        EntityManager.AddComponent(player, new PlayingTrackComponent
+        if(!EntityManager.TryGetFirstEntityWith<PlayingTrackComponent>(out var player)) return;
+        var track = EntityManager.GetComponent<PlayingTrackComponent>(player);
+        if (track.StartTime == null)
         {
-            StartTime = gameTime.TotalGameTime,
-            TrackState = BuildState(track)
-        });
-        var song = track.Song.CreateInstance();
-        song.Volume = 0.05f;
-        song.IsLooped = false;
-        song.Play();
+            track.StartTime = gameTime.TotalGameTime;
+        }
     }
 
     private TrackState BuildState(Track track)

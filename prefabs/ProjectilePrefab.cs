@@ -15,8 +15,13 @@ public class ProjectilePrefab
         EntityManager.AddComponent(projectile, new ScaleComponent { Scale = 2f });
         // EntityManager.AddComponent(projectile, new ZOrderComponent { ZOrder = 2 });
         EntityManager.AddComponent(projectile, new PositionComponent { Position = position });
-        EntityManager.AddComponent(projectile, new ProjectileComponent(spawnTime.TotalGameTime, target));
+        var projectileComponent = new ProjectileComponent(spawnTime.TotalGameTime, target);
+        EntityManager.AddComponent(projectile, projectileComponent);
         EntityManager.AddComponent(projectile, new SheetIndexComponent { X = 0, Y = 0 });
+        EntityManager.AddComponent(projectile, new VelocityComponent
+        {
+            Velocity = Vector2.UnitX * projectileComponent.Velocity
+        });
         EntityManager.AddComponent(projectile, new RenderPipelineComponent(RenderPipeline));
     }
 
