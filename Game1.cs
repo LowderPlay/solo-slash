@@ -6,6 +6,7 @@ using rhythm_cs2;
 using solo_slasher.component;
 using solo_slasher.component.render;
 using solo_slasher.component.render.pipelines;
+using solo_slasher.config;
 using solo_slasher.prefabs;
 using solo_slasher.prefabs.menus;
 using solo_slasher.system;
@@ -26,12 +27,14 @@ public class Game1 : Game
     private MapFillerSystem _mapFillerSystem;
     
     private KeyboardMovementSystem _keyboardMovementSystem;
-    private DuelStartSystem _duelStartSystem;
+    private TrackStateSystem _trackStateSystem;
+    private OverlayDestroySystem _overlayDestroySystem;
     private VelocityMoveSystem _velocityMoveSystem;
     
     private NoteSpawnerSystem _noteSpawnerSystem;
     private NoteMissSystem _noteMissSystem;
     private KeyboardHitCheckSystem _keyboardHitCheckSystem;
+    private CoinCollectSystem _coinCollectSystem;
     private EnemyAiSystem _enemyAiSystem;
     private EnemySpawnSystem _enemySpawnSystem;
     private ProjectileHitSystem _projectileHitSystem;
@@ -62,10 +65,12 @@ public class Game1 : Game
         _mapFillerSystem = new MapFillerSystem();
         _keyboardMovementSystem = new KeyboardMovementSystem();
         _keyboardHitCheckSystem = new KeyboardHitCheckSystem();
-        _duelStartSystem = new DuelStartSystem();
+        _trackStateSystem = new TrackStateSystem();
+        _overlayDestroySystem = new OverlayDestroySystem();
         _noteSpawnerSystem = new NoteSpawnerSystem();
         _enemyAiSystem = new EnemyAiSystem();
         _enemySpawnSystem = new EnemySpawnSystem();
+        _coinCollectSystem = new CoinCollectSystem();
         _projectileHitSystem = new ProjectileHitSystem();
         _velocityMoveSystem = new VelocityMoveSystem();
         _noteMissSystem = new NoteMissSystem();
@@ -78,34 +83,43 @@ public class Game1 : Game
     protected override void LoadContent()
     {
         Assets.LoadAssets(Content, GraphicsDevice);
+        ConfigManager.Load();
+        _graphics.IsFullScreen = ConfigManager.Config.Fullscreen;
+        _graphics.ApplyChanges();
+        
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
         DebugInfoPrefab.Create(_performanceTracker);
         PlayerPrefab.Create();
-
-        ShopMenuPrefab.Create();
-        SettingsMenuPrefab.Create(_graphics, Exit);
-        SongMenuPrefab.Create(GraphicsDevice);
-        NoteBarPrefab.Create(GraphicsDevice.Viewport.Bounds);
+        BuildMenus();
+        NoteBarPrefab.Create(_screenSize);
+        CoinBalancePrefab.Create(_screenSize);
 
         _renderSystem = new RenderSystem(_spriteBatch, _screenSize);
         _renderPipelineBuilderSystem = new RenderPipelineBuilderSystem();
     }
 
+    private void BuildMenus()
+    {
+        ShopMenuPrefab.Create();
+        SettingsMenuPrefab.Create(_graphics, Exit);
+        SongMenuPrefab.Create(GraphicsDevice);
+    }
+
     protected override void Update(GameTime gameTime)
     {
         _performanceTracker.SetUpdateDelta(gameTime.ElapsedGameTime.TotalSeconds);
-        // if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-        //     Exit();
 
         _mapFillerSystem.Update();
-        _duelStartSystem.Update(gameTime);
+        _trackStateSystem.Update(gameTime, BuildMenus);
+        _overlayDestroySystem.Update(gameTime);
         _noteSpawnerSystem.HandleNoteSpawn(gameTime, _screenSize);
         _mouseHandlerSystem.Update(_screenSize, GraphicsDevice.Viewport.Bounds);
         _keyboardMovementSystem.Update(gameTime);
         _keyboardHitCheckSystem.Update(gameTime);
         _enemyAiSystem.Update(gameTime);
         _enemySpawnSystem.Update();
+        _coinCollectSystem.Update();
         _projectileHitSystem.Update();
         _velocityMoveSystem.Update(gameTime);
         _noteMissSystem.Update();
@@ -123,5 +137,10 @@ public class Game1 : Game
         _renderSystem.Render(GraphicsDevice.Viewport.Bounds, gameTime);
 
         base.Draw(gameTime);
+    }
+
+    protected override void OnExiting(object sender, ExitingEventArgs args)
+    {
+        ConfigManager.Save();
     }
 }

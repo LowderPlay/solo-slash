@@ -4,6 +4,7 @@ using rhythm_cs2;
 using solo_slasher.component;
 using solo_slasher.component.animations;
 using solo_slasher.component.render;
+using solo_slasher.config;
 
 namespace solo_slasher.prefabs;
 
@@ -21,7 +22,6 @@ public static class PlayerPrefab
         EntityManager.AddComponent(player, new KeyboardControllableComponent { StepsPerSecond = 250 });
         EntityManager.AddComponent(player, new CameraOriginComponent());
         EntityManager.AddComponent(player, new HealthComponent());
-        EntityManager.AddComponent(player, new PlayerCosmeticsComponent());
     }
 
     private static IEnumerable<IRenderOperation> RenderPipeline(GameTime gameTime, Entity entity)
@@ -45,9 +45,6 @@ public static class PlayerPrefab
                 sheetIndex.X += 0;
             }
         }
-
-        var cosmetics = EntityManager.GetComponent<PlayerCosmeticsComponent>(entity);
-
         yield return new TextureOperation
         {
             Sheet = Assets.Shadow,
@@ -63,14 +60,14 @@ public static class PlayerPrefab
         
         yield return new SpritesheetOperation
         {
-            Sheet = cosmetics.Pants,
+            Sheet = Cosmetics.Pants[ConfigManager.Config.PickedPants].Texture,
             Size = (6, 2),
             Alignment = new Vector2(0.5f, 0.9f)
         };
         
         yield return new SpritesheetOperation
         {
-            Sheet = cosmetics.Shirt,
+            Sheet = Cosmetics.Shirts[ConfigManager.Config.PickedShirt].Texture,
             Size = (6, 2),
             Alignment = new Vector2(0.5f, 0.9f)
         };
@@ -79,7 +76,7 @@ public static class PlayerPrefab
         {
             yield return new SpritesheetOperation
             {
-                Sheet = cosmetics.Guitar,
+                Sheet = Cosmetics.Guitars[ConfigManager.Config.PickedGuitar].Texture,
                 Size = (6, 2),
                 Alignment = new Vector2(0.5f, 0.9f)
             };

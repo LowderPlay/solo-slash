@@ -2,9 +2,11 @@
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using rhythm_cs2;
 using solo_slasher.component;
 using solo_slasher.component.notes;
 using solo_slasher.component.render;
+using solo_slasher.config;
 using solo_slasher.prefabs;
 
 namespace solo_slasher.system.notes;
@@ -46,6 +48,7 @@ public class KeyboardHitCheckSystem
                         ProjectilePrefab.Create(gameTime, playerPosition, target);
                 }
             }
+            Assets.Click.Play(ConfigManager.Config.SoundVolume, 0, 0);
             EntityManager.AddComponent(entity, new HitNoteComponent { Distance = distance });
             EntityManager.AddComponent(entity, new TintComponent
             {

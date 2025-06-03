@@ -46,6 +46,10 @@ public class MouseHandlerSystem
                     Math.Clamp(mousePos.X, box.Left, box.Right), 
                     Math.Clamp(mousePos.Y, box.Top, box.Bottom));
                 mouseComponent.MousePosition = (clampedPos - box.Location.ToVector2()) / scale;
+                EntityManager.AddComponent(player, new LookingDirectionComponent
+                {
+                    Direction = mousePos.X > screenSize.Width / 2 ? LookDirection.Right : LookDirection.Left,
+                });
             }
 
             if (contains)

@@ -20,8 +20,10 @@ public class MapFillerSystem
         var position = EntityManager.GetComponent<PositionComponent>(camera);
         var fov = new Rectangle(
             (position.Position / Constants.ChunkSize - _fillChunks).ToPoint(), 
-            (_fillChunks * 2).ToPoint()
-            );
+            (_fillChunks * 2).ToPoint());
+
+        var keepOutZoneSize = new Vector2(700, 300);
+        var keepOutZone = new Rectangle((-keepOutZoneSize / 2).ToPoint(), keepOutZoneSize.ToPoint());
         
         for (var x = fov.Left; x < fov.Right; x++)
         {
@@ -31,10 +33,7 @@ public class MapFillerSystem
                 if (_filledChunks.Contains(chunk)) continue;
                 var chunkCoords = chunk.ToVector2() * Constants.ChunkSize;
                 
-                if (EntityManager.GetEntitiesWith<UiStructureComponent>()
-                    .Select(e => EntityManager.GetComponent<PositionComponent>(e).Position)
-                    .Select(p => (p - chunkCoords).Length())
-                    .DefaultIfEmpty(300).Min() > 200)
+                if (!keepOutZone.Contains(chunkCoords))
                     MapPrefab.GenerateChunk(chunkCoords);
                 _filledChunks.Add(chunk);
             }

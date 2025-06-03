@@ -8,8 +8,8 @@ public class SpritesheetOperation : IRenderOperation
     public Texture2D Sheet;
     public (int width, int height) Size = (1, 1);
     public Vector2 Alignment = new(0f, 0f);
-    public Vector2 SpriteSize => new(Sheet.Width / Size.width, Sheet.Height / Size.height);
     public float InternalScale = 1f;
+    public Vector2 SpriteSize => new(Sheet.Width / Size.width, Sheet.Height / Size.height);
     
     public virtual void Render(SpriteBatch spriteBatch, Entity entity, Vector2 position, float scale, Color tint, SpriteEffects effects, float rotation)
     {

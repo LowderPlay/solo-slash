@@ -26,7 +26,8 @@ public static class NoteBarPrefab
     private static IEnumerable<IRenderOperation> RenderPipeline(GameTime gameTime, Entity entity, Rectangle screenSize)
     {
         if (!EntityManager.TryGetFirstEntityWith<KeyboardControllableComponent>(out var player) 
-            || !EntityManager.HasComponent<PlayingTrackComponent>(player)) yield break;
+            || !EntityManager.TryGetComponent<PlayingTrackComponent>(player, out var track) 
+            || track.StartTime == null || track.StartTime > gameTime.TotalGameTime) yield break;
 
         yield return new NoteBarOperation(screenSize);
     }

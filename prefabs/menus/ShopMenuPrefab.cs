@@ -11,51 +11,6 @@ using solo_slasher.component.render;
 
 namespace solo_slasher.prefabs.menus;
 
-internal enum ItemType
-{
-    Guitar,
-    Shirt,
-    Pants
-}
-
-internal class ShopItem
-{
-    public ItemType Type;
-    public Texture2D Texture;
-    public string Name;
-
-    public bool Hovered;
-    public bool Selected
-    {
-        get
-        {
-            var cosmetics = EntityManager.TryGetFirstEntityWith<PlayerCosmeticsComponent>(out var player) ? 
-                EntityManager.GetComponent<PlayerCosmeticsComponent>(player) : 
-                new PlayerCosmeticsComponent();
-            return cosmetics.Pants == Texture || cosmetics.Shirt == Texture || cosmetics.Guitar == Texture;
-        }
-    }
-
-    public void Select()
-    {
-        var cosmetics = EntityManager.TryGetFirstEntityWith<PlayerCosmeticsComponent>(out var player) ? 
-            EntityManager.GetComponent<PlayerCosmeticsComponent>(player) : 
-            new PlayerCosmeticsComponent();
-        
-        switch (Type)
-        {
-            case ItemType.Guitar:
-                cosmetics.Guitar = Texture;
-                break;
-            case ItemType.Shirt:
-                cosmetics.Shirt = Texture;
-                break;
-            case ItemType.Pants:
-                cosmetics.Pants = Texture;
-                break;
-        }
-    }
-}
 
 internal class ShopController : IMenuController
 {
@@ -63,27 +18,17 @@ internal class ShopController : IMenuController
     public int Height => ((IMenuController)this).MeasureHeight();
     public IEnumerable<IMenuItem> GetMenuItems()
     {
-        List<(string name, IEnumerable<ShopItem> items)> categories = [
-            ("Футболки", ShopMenuPrefab.Shirts),        
-            ("Штаны", ShopMenuPrefab.Pants),        
-            ("Гитары", ShopMenuPrefab.Guitars),        
+        List<(string name, IEnumerable<CosmeticItem> items)> categories = [
+            ("Футболки", Cosmetics.Shirts.Values),        
+            ("Штаны", Cosmetics.Pants.Values),        
+            ("Гитары", Cosmetics.Guitars.Values),        
         ];
         foreach (var (name, items) in categories)
         {
             yield return new HeadingMenuItem(name);
             foreach (var item in items)
             {
-                yield return new SelectableSpriteMenuItem(
-                    (_, _) => item.Select(), 
-                    hover => item.Hovered = hover,
-                    item.Selected, 
-                    item.Hovered, 
-                    new SpritesheetOperation
-                    {
-                        Sheet = item.Texture,
-                        Alignment = new Vector2(0.5f, 0.5f),
-                        Size = (6, 2)
-                    }, new Vector2(3, 0), item.Name);
+                yield return new ShopMenuItem(item);
             }
         }
     }
@@ -91,63 +36,6 @@ internal class ShopController : IMenuController
 
 public static class ShopMenuPrefab
 {
-    internal static readonly ShopItem[] Shirts =
-    [
-        new()
-        {
-            Type = ItemType.Shirt,
-            Name = "Чёрная",
-            Texture = Assets.PlayerShirtBlack,
-        },
-        new()
-        {
-            Type = ItemType.Shirt,
-            Name = "Зелёная",
-            Texture = Assets.PlayerShirtGreen,
-        },
-        new()
-        {
-            Type = ItemType.Shirt,
-            Name = "Розовая",
-            Texture = Assets.PlayerShirtPink,
-        },
-        new()
-        {
-            Type = ItemType.Shirt,
-            Name = "Белая",
-            Texture = Assets.PlayerShirtWhite,
-        },
-    ];
-    internal static readonly ShopItem[] Pants = [
-        new() {
-            Type = ItemType.Pants,
-            Name = "Серые",
-            Texture = Assets.PlayerPantsGray,
-        },
-        new() {
-            Type = ItemType.Pants,
-            Name = "Белые",
-            Texture = Assets.PlayerPantsWhite,
-        },
-    ];
-    internal static readonly ShopItem[] Guitars = [
-        new() {
-            Type = ItemType.Guitar,
-            Name = "Squier",
-            Texture = Assets.PlayerGuitar1,
-        },
-        new() {
-            Type = ItemType.Guitar,
-            Name = "Strandberg",
-            Texture = Assets.PlayerGuitar2,
-        },
-        new() {
-            Type = ItemType.Guitar,
-            Name = "Stratocaster",
-            Texture = Assets.PlayerGuitar3,
-        },
-    ];
-    
     private static readonly Point ScreenPosition = new Point(32, 58) * new Point(2);
     internal static readonly Point ScreenSize = new Point(101, 83) * new Point(2);
     private static Rectangle _screenRect;

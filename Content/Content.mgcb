@@ -25,6 +25,18 @@
 /processorParam:TextureFormat=Color
 /build:assets/box.png
 
+#begin assets/coin.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:assets/coin.png
+
 #begin assets/controls.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -361,6 +373,36 @@
 /processorParam:TextureFormat=Color
 /build:assets/projectiles/fireball.png
 
+#begin assets/sounds/click.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:assets/sounds/click.wav
+
+#begin assets/sounds/coin.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:assets/sounds/coin.wav
+
+#begin assets/sounds/hit.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:assets/sounds/hit.wav
+
+#begin assets/sounds/lick.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:assets/sounds/lick.wav
+
+#begin assets/sounds/missed.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:assets/sounds/missed.wav
+
 #begin assets/ui/checkbox.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -384,6 +426,13 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:assets/ui/checkmark.png
+
+#begin fonts/balance.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/balance.spritefont
 
 #begin fonts/menu.spritefont
 /importer:FontDescriptionImporter

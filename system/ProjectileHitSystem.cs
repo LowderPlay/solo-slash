@@ -1,5 +1,8 @@
-﻿using solo_slasher.component;
+﻿using rhythm_cs2;
+using solo_slasher.component;
 using solo_slasher.component.render;
+using solo_slasher.config;
+using solo_slasher.prefabs;
 
 namespace solo_slasher.system;
 
@@ -26,6 +29,8 @@ public class ProjectileHitSystem
                 healthComponent.AddHealth(-projectile.Damage);
                 if (healthComponent.Health <= 0)
                 {
+                    Assets.Hit.Play(ConfigManager.Config.SoundVolume, 0, 0);
+                    CoinPrefab.Create(targetPosition.Position);
                     EntityManager.DestroyEntity(projectile.Target);
                 }
             }

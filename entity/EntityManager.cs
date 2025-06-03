@@ -92,7 +92,7 @@ public static class EntityManager {
     }
     
     public static List<Entity> GetEntitiesWithAny(params Type[] anyComponents) {
-        var validEntityIds = new HashSet<long>(Entities.Keys);
+        var validEntityIds = new HashSet<long>();
 
         foreach (var componentType in anyComponents) {
             if (Components.TryGetValue(componentType, out var componentEntities)) 

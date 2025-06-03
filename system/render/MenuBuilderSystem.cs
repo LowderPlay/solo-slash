@@ -50,17 +50,20 @@ public class MenuBuilderSystem
             }
 
 
-            EntityManager.AddComponent(entity, new InternalCanvasComponent
+            if (!EntityManager.TryGetComponent<InternalCanvasComponent>(entity, out var canvas))
             {
-                InternalRender = (sb, _) =>
+                canvas = new InternalCanvasComponent();
+                EntityManager.AddComponent(entity, canvas);
+            }
+
+            canvas.InternalRender = (sb, _) =>
+            {
+                foreach (var action in renderActions)
                 {
-                    foreach (var action in renderActions)
-                    {
-                        action.Invoke(sb);
-                    }
-                }, 
-                Size = new Point(controller.Width, height), 
-            });
+                    action.Invoke(sb);
+                }
+            };
+            canvas.Size = new Point(controller.Width, height);
         }
     }
 }

@@ -9,6 +9,7 @@ using solo_slasher.component.menu;
 using solo_slasher.component.menu.items;
 using solo_slasher.component.render;
 using solo_slasher.component.render.pipelines;
+using solo_slasher.config;
 using solo_slasher.duel;
 using solo_slasher.track;
 
@@ -38,7 +39,7 @@ internal class SongController(List<Track> tracks) : IMenuController
         if(!EntityManager.TryGetFirstEntityWith<KeyboardControllableComponent>(out var player) || 
            EntityManager.HasComponent<PlayingTrackComponent>(player)) return;
         var notes = new Queue<Note>();
-        double time = 1;
+        double time = 0;
         foreach (var section in track.BeatMap.Sections)
         {
             for (var i = 0; i < section.Repeat; i++)
@@ -55,17 +56,19 @@ internal class SongController(List<Track> tracks) : IMenuController
             }
         }
         
+        var song = track.Song.CreateInstance();
+        song.IsLooped = true;
         EntityManager.AddComponent(player, new PlayingTrackComponent
         {
             TrackState = new TrackState
             {
                 Bpm = track.BeatMap.Bpm,
                 Notes = notes,
-            }
+            },
+            Duration = track.Song.Duration,
+            SoundEffect = song,
+            BeforePlaying = TimeSpan.FromMilliseconds(500)
         });
-        var song = track.Song.CreateInstance();
-        song.IsLooped = false;
-        song.Play();
     }
 }
 
@@ -101,8 +104,9 @@ public static class SongMenuPrefab
 
     private static List<Track> LoadTracks(GraphicsDevice graphicsDevice)
     {
-        var track = TrackReader.ReadFile(graphicsDevice, @"E:\JetbrainsProjects\RustRover\slasher-beatmaps\test.zip");
-        return [track];
+        return ConfigManager.GetTracks()
+            .Select(track => TrackReader.ReadFile(graphicsDevice, track))
+            .ToList();
     }
 
     private static IEnumerable<IRenderOperation> RenderPipeline(GameTime gameTime, Entity entity)

@@ -7,6 +7,7 @@ using solo_slasher.component;
 using solo_slasher.component.menu;
 using solo_slasher.component.menu.items;
 using solo_slasher.component.render;
+using solo_slasher.config;
 
 namespace solo_slasher.prefabs.menus;
 
@@ -15,17 +16,17 @@ internal class SettingsController(GraphicsDeviceManager graphics, Action exit) :
     public int Width => SettingsMenuPrefab.ScreenSize.X; 
     public int Height => ((IMenuController)this).MeasureHeight();
 
-    private bool _fullscreen;
     private bool _fullscreenHover;
     private bool _debugHover;
     private bool _exitHover;
-    private float _musicVolume = 1f;
-    private float _soundVolume = 1f;
+
+    private SoundEffectInstance _soundCheckMusic = Assets.GuitarLick.CreateInstance();
+    private SoundEffectInstance _soundCheckEffect = Assets.CoinEffect.CreateInstance();
 
     private void ToggleFullscreen()
     {
-        _fullscreen = !_fullscreen;
-        graphics.IsFullScreen = _fullscreen;
+        ConfigManager.Config.Fullscreen = !ConfigManager.Config.Fullscreen;
+        graphics.IsFullScreen = ConfigManager.Config.Fullscreen;
         graphics.ApplyChanges();
     }
     
@@ -54,7 +55,7 @@ internal class SettingsController(GraphicsDeviceManager graphics, Action exit) :
         yield return new HeadingMenuItem("Настройки");
         yield return new CheckboxMenuItem(
             (_, _) => ToggleFullscreen(), hover => _fullscreenHover = hover, 
-            _fullscreen, _fullscreenHover, "Полный экран");
+            ConfigManager.Config.Fullscreen, _fullscreenHover, "Полный экран");
         yield return new CheckboxMenuItem(
             (_, _) => ToggleDebug(), hover => _debugHover = hover, 
             HasDebug(), _debugHover, "Отладка игры");
@@ -62,12 +63,20 @@ internal class SettingsController(GraphicsDeviceManager graphics, Action exit) :
         yield return new SliderMenuItem(
             (value) =>
             {
-                _musicVolume = value / Width;
-                SoundEffect.MasterVolume = _musicVolume;
-            }, _musicVolume, 
-            _ => {}, false, "Общее");
+                ConfigManager.Config.MusicVolume = value / Width;
+                // if (_soundCheckMusic.Volume == ConfigManager.Config.MusicVolume) return;
+                _soundCheckMusic.Volume = ConfigManager.Config.MusicVolume;
+                _soundCheckMusic.Play();
+            }, ConfigManager.Config.MusicVolume, 
+            _ => {}, false, "Музыка");
         yield return new SliderMenuItem(
-            (value) => _soundVolume = value / Width, _soundVolume, 
+            (value) =>
+            {
+                ConfigManager.Config.SoundVolume = value / Width;
+                // if (_soundCheckEffect.Volume == ConfigManager.Config.SoundVolume) return;
+                _soundCheckEffect.Volume = ConfigManager.Config.SoundVolume;
+                _soundCheckEffect.Play();
+            }, ConfigManager.Config.SoundVolume, 
             _ => {}, false, "Эффекты");
     }
 }

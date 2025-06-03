@@ -15,14 +15,15 @@ public class NoteSpawnerSystem
     {
         if(!EntityManager.TryGetFirstEntityWith<PlayingTrackComponent>(out var player)) return;
         var track = EntityManager.GetComponent<PlayingTrackComponent>(player);
+        if(track.StartTime == null || track.StartTime > gameTime.TotalGameTime) return;
 
-        var msPerBeat = track.TrackState.Bpm / (60 * 1000);
+        var msPerBeat = 60000.0 / track.TrackState.Bpm;
         var arriveTime = (gameTime.TotalGameTime - track.StartTime)?.TotalMilliseconds + Constants.NoteFlyDuration * 1000;
-        var beatTime = arriveTime * msPerBeat;
+        var beatTime = arriveTime / msPerBeat;
         
         while (track.TrackState.Notes.TryPeek(out var note) && note.TimeInBeats <= beatTime)
         {
-            var lateForMs = (beatTime - note.TimeInBeats) / msPerBeat;
+            var lateForMs = (beatTime - note.TimeInBeats) * msPerBeat;
             Console.WriteLine($"Late for {lateForMs}ms");
             NotePrefab.Create(track.TrackState.Notes.Dequeue(), viewportBounds, (float) lateForMs);
         }
