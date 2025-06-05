@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using solo_slasher.component;
 using solo_slasher.component.render;
+using solo_slasher.config;
 using solo_slasher.prefabs;
 
 namespace solo_slasher.system;
@@ -13,6 +14,7 @@ public class EnemySpawnSystem
     
     public void Update()
     {
+        if(ConfigManager.Config.DisabledEnemies) return;
         if(!EntityManager.TryGetFirstEntityWith<CameraOriginComponent>(out var player)) return;
         if(!EntityManager.HasComponent<PlayingTrackComponent>(player)) return;
         var playerPosition = EntityManager.GetComponent<PositionComponent>(player);

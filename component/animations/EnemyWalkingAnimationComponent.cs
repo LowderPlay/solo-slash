@@ -2,4 +2,4 @@
 
 namespace solo_slasher.component.animations;
 
-public class EnemyWalkingAnimationComponent(TimeSpan startedAt) : AnimationComponent(startedAt, 150, 4);
+public class EnemyWalkingAnimationComponent(TimeSpan startedAt, int frameCount) : AnimationComponent(startedAt, 150, frameCount);

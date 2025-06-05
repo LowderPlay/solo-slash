@@ -46,7 +46,6 @@ public class Game1 : Game
     {
         _performanceTracker = new PerformanceTracker();
         _graphics = new GraphicsDeviceManager(this);
-        // TODO: move to settings?
         _graphics.PreferredBackBufferWidth = 1280;
         _graphics.PreferredBackBufferHeight = 720;
         _graphics.HardwareModeSwitch = false;
@@ -120,7 +119,7 @@ public class Game1 : Game
         _enemyAiSystem.Update(gameTime);
         _enemySpawnSystem.Update();
         _coinCollectSystem.Update();
-        _projectileHitSystem.Update();
+        _projectileHitSystem.Update(gameTime);
         _velocityMoveSystem.Update(gameTime);
         _noteMissSystem.Update();
         

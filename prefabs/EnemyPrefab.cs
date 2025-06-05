@@ -26,9 +26,10 @@ public static class EnemyPrefab
             StayDistance = Random.Next(100, 300)
         });
         EntityManager.AddComponent(enemy, new SheetIndexComponent { X = 0, Y = 0 });
+        var enemyTypes = Enum.GetValues(typeof(EnemyType));
         EntityManager.AddComponent(enemy, new EnemyTypeComponent
         {
-            EnemyType = Random.NextDouble() > 0.5 ? EnemyType.Beetroot : EnemyType.Mushroom
+            EnemyType = (EnemyType) enemyTypes.GetValue(Random.Next(enemyTypes.Length))!
         });
         EntityManager.AddComponent(enemy, new RenderPipelineComponent(RenderPipeline));
         EntityManager.AddComponent(enemy, new HealthComponent());
@@ -36,6 +37,7 @@ public static class EnemyPrefab
 
     private static IEnumerable<IRenderOperation> RenderPipeline(GameTime gameTime, Entity entity)
     {
+        var enemyType = EntityManager.GetComponent<EnemyTypeComponent>(entity).EnemyType;
         if (EntityManager.TryGetComponent<SheetIndexComponent>(entity, out var sheetIndex) && 
             EntityManager.TryGetComponent<VelocityComponent>(entity, out var velocityComponent))
         {
@@ -52,15 +54,24 @@ public static class EnemyPrefab
             if (velocityComponent.Velocity != Vector2.Zero)
             {
                 if (!EntityManager.HasComponent<EnemyWalkingAnimationComponent>(entity))
-                    EntityManager.AddComponent(entity, new EnemyWalkingAnimationComponent(gameTime.TotalGameTime));
+                    EntityManager.AddComponent(entity, new EnemyWalkingAnimationComponent(gameTime.TotalGameTime, enemyType == EnemyType.Pumpkin ? 6 : 4));
             }
             else
             {
                 EntityManager.RemoveComponent<EnemyWalkingAnimationComponent>(entity);
             }
 
-            sheetIndex.X = EntityManager.TryGetComponent<EnemyWalkingAnimationComponent>(entity, out var walking) 
-                ? walking.GetCurrentFrame(gameTime) : 0;
+            if (EntityManager.TryGetComponent<EnemyDamageAnimationComponent>(entity, out var damage))
+            {
+                sheetIndex.X = damage.GetCurrentFrame(gameTime);
+                sheetIndex.Y = 1;
+            }
+            else
+            {
+                sheetIndex.X = EntityManager.TryGetComponent<EnemyWalkingAnimationComponent>(entity, out var walking) 
+                    ? walking.GetCurrentFrame(gameTime) : 0;
+                sheetIndex.Y = 0;
+            }
         }
         yield return new TextureOperation
         {
@@ -68,14 +79,17 @@ public static class EnemyPrefab
             Alignment = new Vector2(0.5f, 0.5f),
         };
 
-        var sprite = EntityManager.GetComponent<EnemyTypeComponent>(entity).EnemyType == EnemyType.Beetroot
-            ? Assets.Beetroot
-            : Assets.Mushroom;
+        var sprite = enemyType switch
+        {
+            EnemyType.Mushroom => Assets.Mushroom,
+            EnemyType.Beetroot => Assets.Beetroot,
+            EnemyType.Pumpkin => Assets.Pumpkin,
+        };
         
         yield return new SpritesheetOperation 
         {
             Sheet = sprite,
-            Size = (4, 1),
+            Size = (enemyType == EnemyType.Pumpkin ? 6 : 4, 2),
             Alignment = new Vector2(0.5f, 1f)
         };
         

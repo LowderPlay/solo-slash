@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using solo_slasher.component;
+using solo_slasher.component.animations;
 using solo_slasher.component.render;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 
@@ -35,8 +36,13 @@ public class EnemyAiSystem
                 if (EntityManager.TryGetComponent<HealthComponent>(player, out var healthComponent))
                     healthComponent.AddHealth(-5);
             }
-            
-            if (distance < aiState.StayDistance || (closeEnemies >= Constants.TargetingEnemies && distance > 1000)) 
+
+            var hasDamageAnimation = EntityManager.TryGetComponent<EnemyDamageAnimationComponent>(enemy, out var damage);
+            if (hasDamageAnimation && damage.EndTime <= gameTime.TotalGameTime)
+            {
+                EntityManager.RemoveComponent<EnemyDamageAnimationComponent>(enemy);
+            }
+            if (hasDamageAnimation || distance < aiState.StayDistance || (closeEnemies >= Constants.TargetingEnemies && distance > 1000)) 
                 EntityManager.AddComponent(enemy, new VelocityComponent { Velocity = Vector2.Zero });
             else
             {

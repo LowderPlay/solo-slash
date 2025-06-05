@@ -9,6 +9,7 @@ public static class Assets
 {
     public static Texture2D Mushroom { get; private set; }
     public static Texture2D Beetroot { get; private set; }
+    public static Texture2D Pumpkin { get; private set; }
     public static Texture2D Shadow { get; private set; }
     
     public static Texture2D Grass { get; private set; }
@@ -64,6 +65,7 @@ public static class Assets
     {
         Mushroom = contentManager.Load<Texture2D>("assets/entities/mushroom");
         Beetroot = contentManager.Load<Texture2D>("assets/entities/beet");
+        Pumpkin = contentManager.Load<Texture2D>("assets/entities/pumpkin");
         Shadow = contentManager.Load<Texture2D>("assets/entities/shadow");
         
         Grass = contentManager.Load<Texture2D>("assets/map/grass");

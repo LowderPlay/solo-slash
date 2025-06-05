@@ -58,6 +58,7 @@ internal class SongController(List<Track> tracks) : IMenuController
         
         var song = track.Song.CreateInstance();
         song.IsLooped = true;
+        Console.WriteLine($"duration {track.Song.Duration}");
         EntityManager.AddComponent(player, new PlayingTrackComponent
         {
             TrackState = new TrackState

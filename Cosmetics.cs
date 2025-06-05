@@ -38,7 +38,7 @@ public class CosmeticItem
             }
             else
             {
-                Assets.Hit.Play(ConfigManager.Config.SoundVolume, 0, 0);
+                Assets.Click.Play(ConfigManager.Config.SoundVolume, 0, 0);
                 return;
             }
         }

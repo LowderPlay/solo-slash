@@ -17,6 +17,7 @@ internal class SettingsController(GraphicsDeviceManager graphics, Action exit) :
     public int Height => ((IMenuController)this).MeasureHeight();
 
     private bool _fullscreenHover;
+    private bool _noEnemyHover;
     private bool _debugHover;
     private bool _exitHover;
 
@@ -56,6 +57,9 @@ internal class SettingsController(GraphicsDeviceManager graphics, Action exit) :
         yield return new CheckboxMenuItem(
             (_, _) => ToggleFullscreen(), hover => _fullscreenHover = hover, 
             ConfigManager.Config.Fullscreen, _fullscreenHover, "Полный экран");
+        yield return new CheckboxMenuItem(
+            (_, _) => ConfigManager.Config.DisabledEnemies = !ConfigManager.Config.DisabledEnemies, hover => _noEnemyHover = hover, 
+            ConfigManager.Config.DisabledEnemies, _noEnemyHover, "Без врагов");
         yield return new CheckboxMenuItem(
             (_, _) => ToggleDebug(), hover => _debugHover = hover, 
             HasDebug(), _debugHover, "Отладка игры");

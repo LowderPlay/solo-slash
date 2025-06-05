@@ -11,6 +11,7 @@ public class Config()
     public float MusicVolume { get; set; } = 1;
     public float SoundVolume { get; set; } = 1;
     public bool Fullscreen { get; set; }
+    public bool DisabledEnemies { get; set; }
     
     public string PickedShirt { get; set; } = Assets.PlayerShirtBlack.Name;
     public string PickedPants { get; set; } = Assets.PlayerPantsGray.Name;

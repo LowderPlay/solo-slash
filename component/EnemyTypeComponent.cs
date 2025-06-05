@@ -4,6 +4,7 @@ public enum EnemyType
 {
     Mushroom,
     Beetroot,
+    Pumpkin,
 }
 
 public class EnemyTypeComponent : IComponent
