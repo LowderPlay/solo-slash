@@ -84,6 +84,7 @@ public static class EnemyPrefab
             EnemyType.Mushroom => Assets.Mushroom,
             EnemyType.Beetroot => Assets.Beetroot,
             EnemyType.Pumpkin => Assets.Pumpkin,
+            _ => throw new IndexOutOfRangeException()
         };
         
         yield return new SpritesheetOperation 

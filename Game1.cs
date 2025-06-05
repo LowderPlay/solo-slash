@@ -49,7 +49,7 @@ public class Game1 : Game
         _graphics.PreferredBackBufferWidth = 1280;
         _graphics.PreferredBackBufferHeight = 720;
         _graphics.HardwareModeSwitch = false;
-        
+        Window.Title = "Solo Slash";
         
         _screenSize = new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
         // IsFixedTimeStep = false;

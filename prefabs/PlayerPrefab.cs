@@ -13,7 +13,7 @@ public static class PlayerPrefab
     public static void Create()
     {
         var player = EntityManager.CreateEntity();
-        EntityManager.AddComponent(player, new PositionComponent());
+        EntityManager.AddComponent(player, new PositionComponent { Position = new Vector2(0, 30) });
         EntityManager.AddComponent(player, new ScaleComponent { Scale = 2f });
         // EntityManager.AddComponent(player, new ZOrderComponent { ZOrder = 1 });
         EntityManager.AddComponent(player, new SheetIndexComponent { X = 0, Y = 0 });

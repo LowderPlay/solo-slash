@@ -62,7 +62,7 @@ internal class SettingsController(GraphicsDeviceManager graphics, Action exit) :
             ConfigManager.Config.DisabledEnemies, _noEnemyHover, "Без врагов");
         yield return new CheckboxMenuItem(
             (_, _) => ToggleDebug(), hover => _debugHover = hover, 
-            HasDebug(), _debugHover, "Отладка игры");
+            HasDebug(), _debugHover, "Производительность");
         yield return new HeadingMenuItem("Громкость");
         yield return new SliderMenuItem(
             (value) =>
