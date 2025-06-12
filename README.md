@@ -1,5 +1,5 @@
 ﻿<p align="center">
-  <img style="image-rendering: pixelated" width="460" height="300" src="Content/assets/logo.png">
+  <img src="readme-logo.png" alt="logo">
 </p>
 
 # Solo Slash
