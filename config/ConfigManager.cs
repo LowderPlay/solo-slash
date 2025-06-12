@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using rhythm_cs2;
 
@@ -37,11 +38,23 @@ public static class ConfigManager
 
     private static string ConfigFilePath => Path.Combine(ConfigFolderPath, "config.json");
     private static string TracksFolderPath => Path.Combine(ConfigFolderPath, "tracks");
+    private static string FactoryTracksPath => Path.Combine("Content", "tracks");
 
     public static IEnumerable<string> GetTracks()
     {
         Directory.CreateDirectory(TracksFolderPath);
         return Directory.EnumerateFiles(TracksFolderPath);
+    }
+
+    private static void PreloadTracks()
+    {
+        var existingTracks = new HashSet<string>(GetTracks().Select(Path.GetFileName));
+        foreach (var missing in Directory.GetFiles(FactoryTracksPath)
+                     .Where(x => !existingTracks.Contains(Path.GetFileName(x))))
+        {
+            Console.WriteLine($"Installing track {missing}");
+            File.Copy(missing, Path.Join(TracksFolderPath,  Path.GetFileName(missing)));
+        }
     }
 
     public static void Load()
@@ -52,6 +65,8 @@ public static class ConfigManager
         Config = (Config) JsonSerializer.Deserialize(stream, typeof(Config))!;
         Console.WriteLine($"Loaded {Config}");
         stream.Close();
+        
+        PreloadTracks();
     }
 
     public static void Save()

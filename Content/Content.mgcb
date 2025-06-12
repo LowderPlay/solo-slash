@@ -474,3 +474,12 @@
 /processorParam:TextureFormat=Compressed
 /build:fonts/title.spritefont
 
+#begin tracks/Electric Sunrise.zip
+/copy:tracks/Electric Sunrise.zip
+
+#begin tracks/Kimi ni Kaikisen.zip
+/copy:tracks/Kimi ni Kaikisen.zip
+
+#begin tracks/test.zip
+/copy:tracks/test.zip
+
